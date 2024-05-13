@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 
-from socialmedia.models.post import (
+from src.models.post import (
     Comment, 
     CommentIn,
     UserPost, 
@@ -12,7 +12,7 @@ from socialmedia.models.post import (
 router = APIRouter()
 
 post_table = {}
-comment_table = {}
+comments_table = {}
 
 def find_post(post_id):
     return post_table.get(post_id)
@@ -39,16 +39,16 @@ async def create_comment(comment: CommentIn):
         raise HTTPException(status_code=404, detail="Post not found")
     
     data = comment.model_dump()
-    last_record_id = len(comment_table)
+    last_record_id = len(comments_table)
     new_comment = { **data, "id" : last_record_id}
-    comment_table[last_record_id] = new_comment
+    comments_table[last_record_id] = new_comment
 
     return new_comment
 
 @router.get("/post/{post_id}/comment", response_model=List[Comment])
 async def get_comments_on_post(post_id: int):
     comments = []
-    for comment in comment_table.values():
+    for comment in comments_table.values():
         if comment["post_id"] == post_id:
             comments.append(comment)
     return comments
