@@ -1,12 +1,15 @@
-from typing import AsyncGenerator, Generator
-
+import os
 import pytest
-from httpx import AsyncClient, ASGITransport
+
 from fastapi.testclient import TestClient
+from typing import AsyncGenerator, Generator
+from httpx import AsyncClient, ASGITransport
+
+
+os.environ["ENV_STATE"] = "test"
 
 from src.main import app
-from src.routers.posts import post_table, comments_table
-
+from src.database import database
 
 @pytest.fixture(scope="session")
 def anyio_backend():
@@ -18,9 +21,9 @@ def client() -> Generator:
 
 @pytest.fixture(autouse=True)
 async def db() -> AsyncGenerator:
-    post_table.clear()
-    comments_table.clear()
+    await database.connect()
     yield
+    await database.disconnect()
 
 @pytest.fixture()
 async def async_client(client) -> AsyncGenerator:

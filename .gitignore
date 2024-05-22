@@ -1,6 +1,7 @@
 # From me
 .DS_Store
 *.pyc
+material/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
